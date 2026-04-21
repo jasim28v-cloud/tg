@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VOID_LION_V26 | THE ULTIMATE FULL ARCHIVE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700;900&display=swap');
+        
+        :root { --v-color: #00f2ff; --bg: #000; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
+
+        /* محرك التصفح (Void-Engine) */
+        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; position: relative; z-index: 10; }
+        .scroll-engine::-webkit-scrollbar { display: none; }
+        
+        .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; scroll-snap-stop: always; position: relative; overflow: hidden; }
+
+        /* تأثير الثقب الأسود العميق */
+        video { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 5;
+            -webkit-mask-image: radial-gradient(circle at center, black 35%, rgba(0,0,0,0.4) 65%, transparent 95%);
+            mask-image: radial-gradient(circle at center, black 35%, rgba(0,0,0,0.4) 65%, transparent 95%);
+            transition: transform 0.6s ease-out;
+        }
+
+        /* العلامة المائية (التي سألت عنها) */
+        .watermark { 
+            position: absolute; top: 50%; right: 15px; transform: translateY(-50%) rotate(-90deg); 
+            font-family: 'Orbitron'; font-size: 11px; font-weight: 900; 
+            color: rgba(255,255,255,0.18); letter-spacing: 6px; z-index: 45; pointer-events: none; 
+            text-shadow: 0 0 5px var(--v-color);
+        }
+
+        /* رادار النشاط */
+        .radar-box { position: fixed; top: 125px; left: 25px; width: 60px; height: 60px; border: 1px solid var(--v-color); border-radius: 50%; background: rgba(0,242,255,0.05); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .radar-line { position: absolute; width: 100%; height: 1px; background: var(--v-color); animation: radar-sweep 2s linear infinite; }
+        @keyframes radar-sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .activity-ping { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px var(--v-color); animation: ping-fade 1s forwards; }
+
+        /* الساعة الرقمية وسجل النظام */
+        .digital-clock { position: fixed; top: 35px; left: 25px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 8px 15px; border-radius: 12px; border: 1px solid var(--v-color); font-family: 'Orbitron'; font-size: 14px; color: var(--v-color); z-index: 1000; box-shadow: 0 0 10px var(--v-color); }
+        .system-log { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 85%; text-align: center; font-family: 'Orbitron'; font-size: 8px; color: var(--v-color); opacity: 0.7; z-index: 400; }
+
+        /* الأزرار الجانبية والهوية الرقمية */
+        .sidebar-ops { position: absolute; left: 20px; top: 55%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 18px; z-index: 100; }
+        .neural-id-tag { width: 30px; height: 10px; border: 1px solid var(--v-color); border-radius: 2px; margin-bottom: 5px; opacity: 0.8; }
+        .op-btn { width: 58px; height: 58px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1.5px solid var(--v-color); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+        .op-btn i { font-size: 20px; color: var(--v-color); }
+        .op-btn span { font-size: 8px; font-family: 'Orbitron'; color: #fff; margin-top: 2px; font-weight: bold; }
+
+        /* الشريط السفلي والأسد */
+        header { position: fixed; top: 30px; right: 25px; z-index: 500; }
+        .brand-box { background: rgba(0,0,0,0.4); padding: 10px 20px; border-right: 4px solid var(--v-color); backdrop-filter: blur(15px); border-radius: 8px; display: flex; align-items: center; gap: 12px; }
+        
+        nav { position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; height: 75px; background: rgba(0,5,10,0.8); backdrop-filter: blur(25px); border: 1px solid var(--v-color); border-radius: 40px; display: flex; justify-content: space-around; align-items: center; z-index: 500; }
+        #upload-trigger { width: 75px; height: 75px; background: linear-gradient(135deg, var(--v-color), #0044ff); border-radius: 50%; margin-top: -45px; display: flex; align-items: center; justify-content: center; border: 5px solid #000; box-shadow: 0 0 25px var(--v-color); cursor: pointer; }
+
+        /* النوافذ العائمة */
+        #comment-overlay, #admin-panel { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.97); display: none; flex-direction: column; padding: 40px 25px; backdrop-filter: blur(20px); }
+    </style>
+</head>
+<body>
+
+    <div class="digital-clock" id="clock">00:00:00</div>
+    <div class="radar-box"><div class="radar-line"></div><div id="radar-pings"></div></div>
+    <div class="system-log" id="log-text">SYSTEM_ACTIVE :: WAITING FOR NODES...</div>
+    
+    <header>
+        <div class="brand-box">
+            <i class="fas fa-lion text-2xl" style="color: var(--v-color);"></i>
+            <span class="font-[Orbitron] text-[13px] font-black tracking-[4px] text-white">VOID_LION_V26</span>
+        </div>
+    </header>
+
+    <main class="scroll-engine" id="video-stack"></main>
+
+    <nav>
+        <div class="cursor-pointer text-white/30 hover:text-white" onclick="checkAdmin()"><i class="fas fa-fingerprint text-3xl"></i></div>
+        <div id="upload-trigger"><i class="fas fa-camera text-2xl text-white"></i></div>
+        <div class="cursor-pointer text-white/30 hover:text-white" onclick="toggleComments()"><i class="fas fa-tower-broadcast text-3xl"></i></div>
+    </nav>
+
+    <div id="comment-overlay">
+        <div class="flex justify-between items-center mb-8 border-b border-cyan-900 pb-4">
+            <h2 class="font-[Orbitron] text-cyan-400 text-xl tracking-[4px]">NEURAL_CHAT</h2>
+            <i class="fas fa-xmark text-3xl text-red-500 cursor-pointer" onclick="toggleComments()"></i>
+        </div>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 mb-6"></div>
+        <div class="flex gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+            <input type="text" id="msg-input" class="flex-1 bg-transparent outline-none text-cyan-400" placeholder="Type signal...">
+            <button onclick="sendSignal()" class="text-cyan-400"><i class="fas fa-paper-plane text-2xl"></i></button>
+        </div>
+    </div>
+
+    <div id="admin-panel">
+        <div class="flex justify-between items-center mb-8 border-b border-red-900 pb-4">
+            <h2 class="font-[Orbitron] text-red-500 text-xl font-bold">PURGE_DASHBOARD</h2>
+            <i class="fas fa-xmark text-3xl text-white cursor-pointer" onclick="closeAdmin()"></i>
+        </div>
+        <div class="flex-1 overflow-y-auto space-y-4" id="admin-master-list"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = { databaseURL: "https://vexe-f6558-default-rtdb.firebaseio.com/" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function updateLog(msg) {
+            document.getElementById('log-text').innerText = msg;
+            const ping = document.createElement('div');
+            ping.className = 'activity-ping';
+            ping.style.left = Math.random() * 40 + 10 + 'px';
+            ping.style.top = Math.random() * 40 + 10 + 'px';
+            document.getElementById('radar-pings').appendChild(ping);
+            setTimeout(() => ping.remove(), 1000);
+        }
+
+        const widget = cloudinary.createUploadWidget({ 
+            cloudName: "duzoqh3jp", uploadPreset: "so_34k",
+            sources: ['local'], clientAllowedFormats: ["video"], multiple: false
+        }, (e, r) => {
+            if (r.event === "success") {
+                db.ref('videos/').push({ url: r.info.secure_url, likes: 0, timestamp: Date.now() });
+                updateLog("NEW_ASSET_DEPLOYED");
+            }
+        });
+        document.getElementById("upload-trigger").onclick = () => widget.open();
+
+        const ionicColors = ['#00f2ff', '#ff007f', '#00ff88', '#ffcc00', '#9d00ff'];
+
+        db.ref('videos').on('value', snap => {
+            const container = document.getElementById('video-stack');
+            const adminList = document.getElementById('admin-master-list');
+            container.innerHTML = ''; adminList.innerHTML = '';
+            const data = snap.val(); if(!data) return;
+
+            Object.keys(data).reverse().forEach(id => {
+                const vid = data[id];
+                const section = document.createElement('section');
+                section.className = 'v-seg';
+                section.innerHTML = `
+                    <div class="watermark">VOID_LION_PRO</div>
+                    <video id="vid-${id}" loop playsinline muted data-src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
+                    <div class="sidebar-ops">
+                        <div class="neural-id-tag" style="background: hsl(${id.charCodeAt(0)*5}, 100%, 50%)"></div>
+                        <div class="op-btn" onclick="triggerLike('${id}')"><i class="fas fa-bolt"></i><span>${vid.likes || 0}</span></div>
+                        <div class="op-btn" onclick="toggleMute('${id}')" id="mute-btn-${id}"><i class="fas fa-volume-off"></i><span>AUDIO</span></div>
+                        <div class="op-btn" onclick="toggleComments()"><i class="fas fa-comment"></i><span>COMMS</span></div>
+                    </div>`;
+                container.appendChild(section);
+                adminList.innerHTML += `<div class="bg-white/5 p-4 rounded-xl flex justify-between border border-white/10"><span>NODE_${id.substring(0,6)}</span><button onclick="deleteVid('${id}')" class="text-red-500">DELETE</button></div>`;
+            });
+            initObserver();
+        });
+
+        function initObserver() {
+            const obs = new IntersectionObserver((es) => {
+                es.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if (e.isIntersecting) { 
+                        if(!v.src) v.src = v.dataset.src;
+                        v.play().catch(()=>{}); 
+                        document.documentElement.style.setProperty('--v-color', ionicColors[Math.floor(Math.random() * 5)]);
+                        updateLog("SCANNING_NODE_" + v.id.substring(4,10));
+                    } else { v.pause(); }
+                });
+            }, { threshold: 0.7 });
+            document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
+        }
+
+        function sendSignal() {
+            const inp = document.getElementById('msg-input');
+            if(inp.value.trim()) { db.ref('vox_chat').push({ text: inp.value }); inp.value = ''; updateLog("SIGNAL_BROADCASTED"); }
+        }
+
+        db.ref('vox_chat').on('value', s => {
+            const box = document.getElementById('chat-box'); box.innerHTML = '';
+            s.forEach(m => {
+                box.innerHTML += `<div class="bg-white/5 p-3 rounded-lg border-r-2 border-[var(--v-color)] font-mono text-[11px] text-white/80">
+                    <span style="color: hsl(${m.key.charCodeAt(0)*5}, 100%, 50%)">●</span> SIGNAL_IN:: ${m.val().text}</div>`;
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+
+        function toggleMute(id) { const v = document.getElementById('vid-'+id); v.muted = !v.muted; document.getElementById('mute-btn-'+id).innerHTML = v.muted ? '<i class="fas fa-volume-off"></i><span>AUDIO</span>' : '<i class="fas fa-volume-up"></i><span>LIVE</span>'; }
+        function checkAdmin() { if(prompt("ACCESS:") === "1234") document.getElementById('admin-panel').style.display = 'flex'; }
+        function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
+        function deleteVid(id) { if(confirm("Confirm Purge?")) db.ref('videos/' + id).remove(); }
+        function toggleComments() { const o = document.getElementById('comment-overlay'); o.style.display = (o.style.display==='flex')?'none':'flex'; }
+        function triggerLike(id) { db.ref('videos/' + id + '/likes').transaction(l => (l || 0) + 1); updateLog("NODE_UPVOTED"); }
+        setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'), 1000);
+    </script>
+</body>
+</html>
