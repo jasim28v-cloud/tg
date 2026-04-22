@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VOID_LION_V27 | ELITE EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700;900&display=swap');
@@ -39,31 +39,45 @@
         .op-btn { width: 58px; height: 58px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1.5px solid var(--v-color); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         .op-btn i { font-size: 20px; color: var(--v-color); }
         .op-btn span { font-size: 8px; font-family: 'Orbitron'; color: #fff; margin-top: 2px; font-weight: bold; }
-        .op-btn:hover { background: rgba(0, 242, 255, 0.2); transform: scale(1.1); }
 
         header { position: fixed; top: 30px; right: 25px; z-index: 500; }
         .brand-box { background: rgba(0,0,0,0.4); padding: 10px 20px; border-right: 4px solid var(--v-color); backdrop-filter: blur(15px); border-radius: 8px; display: flex; align-items: center; gap: 12px; }
         
         nav { position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; height: 75px; background: rgba(0,5,10,0.8); backdrop-filter: blur(25px); border: 1px solid var(--v-color); border-radius: 40px; display: flex; justify-content: space-around; align-items: center; z-index: 500; }
-        #upload-trigger { width: 75px; height: 75px; background: linear-gradient(135deg, var(--v-color), #0044ff); border-radius: 50%; margin-top: -45px; display: flex; align-items: center; justify-content: center; border: 5px solid #000; box-shadow: 0 0 25px var(--v-color); cursor: pointer; transition: all 0.3s; }
-        #upload-trigger:hover { transform: scale(1.1); box-shadow: 0 0 35px var(--v-color); }
+        #upload-trigger { width: 75px; height: 75px; background: linear-gradient(135deg, var(--v-color), #0044ff); border-radius: 50%; margin-top: -45px; display: flex; align-items: center; justify-content: center; border: 5px solid #000; box-shadow: 0 0 25px var(--v-color); cursor: pointer; }
 
         #comment-overlay, #admin-panel, #upload-panel { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.97); display: none; flex-direction: column; padding: 40px 25px; backdrop-filter: blur(20px); overflow-y: auto; }
 
-        /* أنماط شريط التحميل */
-        .upload-progress-container {
-            background: rgba(0, 242, 255, 0.05);
-            border: 1px solid var(--v-color);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 15px 0;
+        /* أنماط واجهة الرفع المخصصة */
+        .upload-area {
+            border: 2px dashed var(--v-color);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0, 242, 255, 0.02);
+            margin: 20px 0;
         }
 
-        .progress-bar-wrapper {
+        .upload-area:hover {
+            background: rgba(0, 242, 255, 0.05);
+            border-color: #fff;
+        }
+
+        .progress-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--v-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .progress-bar-bg {
             width: 100%;
-            height: 8px;
+            height: 10px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: 5px;
             overflow: hidden;
             margin: 15px 0;
         }
@@ -71,123 +85,41 @@
         .progress-bar-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--v-color), #0044ff);
-            border-radius: 4px;
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width 0.3s;
             box-shadow: 0 0 15px var(--v-color);
-            position: relative;
         }
 
-        .progress-bar-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .upload-status {
-            font-family: 'Orbitron';
-            color: var(--v-color);
-            font-size: 11px;
-            letter-spacing: 2px;
-        }
-
-        .file-preview {
+        .preview-media {
             max-width: 100%;
             max-height: 200px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 2px solid var(--v-color);
-            margin: 15px 0;
-            object-fit: contain;
+            margin: 15px auto;
         }
 
-        .upload-type-selector {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .type-btn {
-            flex: 1;
-            padding: 15px;
-            background: rgba(0, 242, 255, 0.05);
-            border: 1px solid rgba(0, 242, 255, 0.3);
+        .upload-btn {
+            background: linear-gradient(135deg, var(--v-color), #0044ff);
+            color: white;
+            padding: 15px 30px;
             border-radius: 12px;
-            color: #fff;
-            font-family: 'Orbitron';
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-
-        .type-btn.active {
-            background: var(--v-color);
-            color: #000;
-            box-shadow: 0 0 25px var(--v-color);
-            border-color: var(--v-color);
-        }
-
-        .type-btn:hover:not(.active) {
-            background: rgba(0, 242, 255, 0.15);
-            border-color: var(--v-color);
-        }
-
-        #drop-zone {
-            border: 2px dashed rgba(0, 242, 255, 0.3);
-            border-radius: 16px;
-            padding: 30px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: rgba(0, 242, 255, 0.02);
-        }
-
-        #drop-zone:hover {
-            border-color: var(--v-color);
-            background: rgba(0, 242, 255, 0.05);
-        }
-
-        #drop-zone.dragover {
-            border-color: var(--v-color);
-            background: rgba(0, 242, 255, 0.1);
-            transform: scale(1.02);
-        }
-
-        .upload-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .stat-box {
-            background: rgba(0, 242, 255, 0.05);
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 9px;
-            color: rgba(255,255,255,0.5);
-            font-family: 'Orbitron';
-        }
-
-        .stat-value {
-            font-size: 14px;
-            color: var(--v-color);
             font-family: 'Orbitron';
             font-weight: bold;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upload-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 0 25px var(--v-color);
         }
     </style>
 </head>
@@ -206,225 +138,232 @@
     <main class="scroll-engine" id="video-stack"></main>
 
     <nav>
-        <div class="cursor-pointer text-white/30 hover:text-white/60 transition-colors" onclick="checkAdmin()">
-            <i class="fas fa-fingerprint text-3xl"></i>
-        </div>
-        <div id="upload-trigger">
-            <i class="fas fa-cloud-upload-alt text-2xl text-white"></i>
-        </div>
-        <div class="cursor-pointer text-white/30 hover:text-white/60 transition-colors" onclick="toggleComments()">
-            <i class="fas fa-tower-broadcast text-3xl"></i>
-        </div>
+        <div class="cursor-pointer text-white/30" onclick="checkAdmin()"><i class="fas fa-fingerprint text-3xl"></i></div>
+        <div id="upload-trigger"><i class="fas fa-cloud-upload-alt text-2xl text-white"></i></div>
+        <div class="cursor-pointer text-white/30" onclick="toggleComments()"><i class="fas fa-tower-broadcast text-3xl"></i></div>
     </nav>
 
-    <!-- لوحة الرفع المطورة -->
+    <!-- لوحة الرفع المطورة - نسخة نظيفة -->
     <div id="upload-panel">
         <div class="flex justify-between items-center mb-6 border-b border-cyan-900 pb-4">
-            <h2 class="font-[Orbitron] text-cyan-400 text-xl tracking-[4px]">
-                <i class="fas fa-upload mr-2"></i>UPLOAD_ASSET
+            <h2 class="font-[Orbitron] text-cyan-400 text-xl">
+                <i class="fas fa-upload mr-2"></i>UPLOAD CENTER
             </h2>
-            <i class="fas fa-times-circle text-3xl text-red-500 cursor-pointer hover:text-red-400 transition-colors" onclick="closeUploadPanel()"></i>
+            <i class="fas fa-times-circle text-3xl text-red-500 cursor-pointer" onclick="closeUploadPanel()"></i>
         </div>
 
-        <!-- اختيار نوع الرفع -->
-        <div class="upload-type-selector">
-            <button class="type-btn active" onclick="setUploadType('video')">
+        <!-- اختيار النوع -->
+        <div class="flex gap-4 mb-6">
+            <button class="flex-1 py-3 rounded-lg font-[Orbitron] bg-cyan-500/20 border border-cyan-400 text-cyan-400" 
+                    id="videoTypeBtn" onclick="setUploadType('video')">
                 <i class="fas fa-video mr-2"></i>VIDEO
             </button>
-            <button class="type-btn" onclick="setUploadType('image')">
+            <button class="flex-1 py-3 rounded-lg font-[Orbitron] bg-white/5 border border-white/20 text-white/70" 
+                    id="imageTypeBtn" onclick="setUploadType('image')">
                 <i class="fas fa-image mr-2"></i>IMAGE
             </button>
         </div>
 
-        <!-- منطقة السحب والإفلات -->
-        <div id="drop-zone" onclick="document.getElementById('file-input').click()">
-            <i class="fas fa-cloud-upload-alt text-5xl text-cyan-400 mb-4"></i>
-            <p class="font-[Orbitron] text-cyan-300 text-sm mb-2">DRAG & DROP OR CLICK TO SELECT</p>
-            <p class="text-xs text-white/50" id="file-type-hint">VIDEO FILES ONLY (MP4, MOV, AVI)</p>
+        <!-- منطقة الرفع -->
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-cloud-upload-alt text-6xl text-cyan-400 mb-4"></i>
+            <p class="font-[Orbitron] text-lg text-cyan-300 mb-2">SELECT FILE</p>
+            <p class="text-sm text-white/50" id="fileTypeHint">Click or drop video file here</p>
         </div>
 
-        <input type="file" id="file-input" accept="video/*" style="display: none;">
+        <input type="file" id="fileInput" accept="video/*" style="display: none;">
 
-        <!-- شريط التحميل -->
-        <div id="progress-section" style="display: none;">
-            <div class="upload-progress-container">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="upload-status" id="upload-status">
-                        <i class="fas fa-spinner fa-spin mr-2"></i>INITIALIZING...
+        <!-- شريط التقدم -->
+        <div id="progressSection" style="display: none;">
+            <div class="progress-container">
+                <div class="flex justify-between mb-2">
+                    <span class="font-[Orbitron] text-cyan-400 text-sm" id="uploadStatus">
+                        <i class="fas fa-clock mr-2"></i>READY
                     </span>
-                    <span class="upload-status" id="upload-percent">0%</span>
-                </div>
-                <div class="progress-bar-wrapper">
-                    <div class="progress-bar-fill" id="progress-bar"></div>
+                    <span class="font-[Orbitron] text-cyan-400 text-sm" id="uploadPercent">0%</span>
                 </div>
                 
-                <!-- إحصائيات التحميل -->
-                <div class="upload-stats">
-                    <div class="stat-box">
-                        <div class="stat-label">FILE SIZE</div>
-                        <div class="stat-value" id="file-size">0 MB</div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div class="text-center">
+                        <p class="text-xs text-white/50">FILE SIZE</p>
+                        <p class="font-[Orbitron] text-cyan-400" id="fileSize">0 MB</p>
                     </div>
-                    <div class="stat-box">
-                        <div class="stat-label">UPLOADED</div>
-                        <div class="stat-value" id="uploaded-size">0 MB</div>
+                    <div class="text-center">
+                        <p class="text-xs text-white/50">UPLOADED</p>
+                        <p class="font-[Orbitron] text-cyan-400" id="uploadedSize">0 MB</p>
                     </div>
                 </div>
-                
-                <div id="file-preview-container" class="text-center"></div>
-                
-                <div class="text-center mt-3">
-                    <span class="text-xs text-white/40 font-[Orbitron]" id="time-remaining">--</span>
-                </div>
+
+                <div id="previewContainer" class="text-center mt-4"></div>
             </div>
         </div>
 
         <!-- أزرار التحكم -->
-        <div class="flex gap-3 mt-6">
-            <button onclick="startUpload()" id="upload-btn" class="flex-1 bg-cyan-500/20 border border-cyan-400 text-cyan-400 py-4 rounded-lg font-[Orbitron] hover:bg-cyan-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                <i class="fas fa-play mr-2"></i>START UPLOAD
-            </button>
-            <button onclick="closeUploadPanel()" class="flex-1 bg-white/5 border border-white/20 text-white/70 py-4 rounded-lg font-[Orbitron] hover:bg-white/10 transition-all">
-                <i class="fas fa-times mr-2"></i>CANCEL
-            </button>
-        </div>
+        <button class="upload-btn mt-6" id="uploadBtn" onclick="startUpload()" disabled>
+            <i class="fas fa-play mr-2"></i>START UPLOAD
+        </button>
+        
+        <button class="w-full py-3 rounded-lg font-[Orbitron] bg-white/5 border border-white/20 text-white/70 mt-3" 
+                onclick="closeUploadPanel()">
+            <i class="fas fa-times mr-2"></i>CANCEL
+        </button>
     </div>
 
     <div id="comment-overlay">
         <div class="flex justify-between items-center mb-8 border-b border-cyan-900 pb-4">
-            <h2 class="font-[Orbitron] text-cyan-400 text-xl tracking-[4px]">
-                <i class="fas fa-satellite-dish mr-2"></i>NEURAL_CHAT
-            </h2>
-            <i class="fas fa-times-circle text-3xl text-red-500 cursor-pointer hover:text-red-400" onclick="toggleComments()"></i>
+            <h2 class="font-[Orbitron] text-cyan-400 text-xl tracking-[4px]">NEURAL_CHAT</h2>
+            <i class="fas fa-times-circle text-3xl text-red-500 cursor-pointer" onclick="toggleComments()"></i>
         </div>
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 mb-6"></div>
         <div class="flex gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
             <input type="text" id="msg-input" class="flex-1 bg-transparent outline-none text-cyan-400" placeholder="Type signal...">
-            <button onclick="sendSignal()" class="text-cyan-400 hover:text-cyan-300">
-                <i class="fas fa-paper-plane text-2xl"></i>
-            </button>
+            <button onclick="sendSignal()" class="text-cyan-400"><i class="fas fa-paper-plane text-2xl"></i></button>
         </div>
     </div>
 
     <div id="admin-panel">
         <div class="flex justify-between items-center mb-8 border-b border-red-900 pb-4">
-            <h2 class="font-[Orbitron] text-red-500 text-xl font-bold">
-                <i class="fas fa-skull mr-2"></i>PURGE_DASHBOARD
-            </h2>
-            <i class="fas fa-times-circle text-3xl text-white cursor-pointer hover:text-red-400" onclick="closeAdmin()"></i>
+            <h2 class="font-[Orbitron] text-red-500 text-xl font-bold">PURGE_DASHBOARD</h2>
+            <i class="fas fa-times-circle text-3xl text-white cursor-pointer" onclick="closeAdmin()"></i>
         </div>
         <div class="flex-1 overflow-y-auto space-y-4" id="admin-master-list"></div>
     </div>
 
     <script>
-        // تهيئة Firebase
-        const firebaseConfig = { databaseURL: "https://vexe-f6558-default-rtdb.firebaseio.com/" };
+        // تكوين Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqN0N0qC0qC0qC0qC0qC0qC0qC0qC0qC0",
+            authDomain: "vexe-f6558.firebaseapp.com",
+            databaseURL: "https://vexe-f6558-default-rtdb.firebaseio.com",
+            projectId: "vexe-f6558",
+            storageBucket: "vexe-f6558.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:1234567890123456789012"
+        };
+        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const storage = firebase.storage();
 
         // متغيرات عامة
-        let currentUploadType = 'video';
+        let currentType = 'video';
         let selectedFile = null;
-        let cloudinaryWidget = null;
-        let uploadStartTime = null;
 
-        function updateLog(msg) { 
-            const logElement = document.getElementById('log-text');
-            if(logElement) logElement.innerText = msg; 
+        function updateLog(msg) {
+            document.getElementById('log-text').innerText = msg;
         }
 
-        // تهيئة Cloudinary Widget
-        function initCloudinaryWidget() {
-            cloudinaryWidget = cloudinary.createUploadWidget({ 
-                cloudName: "duzoqh3jp", 
-                uploadPreset: "so_34k",
-                sources: ['local', 'camera', 'url'],
-                clientAllowedFormats: currentUploadType === 'video' ? ["video", "mp4", "mov", "avi"] : ["image", "jpg", "jpeg", "png", "gif"],
-                maxFileSize: currentUploadType === 'video' ? 100000000 : 20000000,
-                multiple: false,
-                showAdvancedOptions: false,
-                cropping: false,
-                styles: {
-                    palette: {
-                        window: "#000000",
-                        windowBorder: "#00f2ff",
-                        tabIcon: "#00f2ff",
-                        menuIcons: "#ffffff",
-                        textDark: "#000000",
-                        textLight: "#ffffff",
-                        link: "#00f2ff",
-                        action: "#00f2ff",
-                        inactiveTabIcon: "#444444",
-                        error: "#ff0033",
-                        inProgress: "#00f2ff",
-                        complete: "#00ff88",
-                        sourceBg: "#050505"
-                    }
-                }
-            }, (error, result) => {
-                if (error) {
-                    updateLog("UPLOAD_ERROR :: " + error);
-                    document.getElementById('upload-status').innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>UPLOAD FAILED';
-                    return;
-                }
-                
-                if (result && result.event === "success") { 
-                    updateLog("UPLOAD_COMPLETE :: SAVING TO DATABASE");
-                    document.getElementById('upload-status').innerHTML = '<i class="fas fa-check-circle mr-2"></i>UPLOAD COMPLETE';
-                    
-                    // حفظ في قاعدة البيانات
-                    const uploadData = {
-                        url: result.info.secure_url,
-                        type: currentUploadType,
-                        likes: 0, 
-                        timestamp: Date.now(),
-                        size: result.info.bytes,
-                        format: result.info.format
-                    };
-                    
-                    db.ref('videos/').push(uploadData)
-                        .then(() => {
-                            updateLog("ASSET_STABILIZED :: " + currentUploadType.toUpperCase());
-                            setTimeout(() => {
-                                closeUploadPanel();
-                                resetUploadInterface();
-                            }, 2000);
-                        })
-                        .catch(err => {
-                            updateLog("DATABASE_ERROR :: " + err);
-                        });
-                        
-                } else if (result && result.event === "progress") {
-                    updateProgressBar(result.info);
-                } else if (result && result.event === "queued") {
-                    updateLog("UPLOAD_QUEUED :: " + result.info.files[0].name);
-                    document.getElementById('upload-status').innerHTML = '<i class="fas fa-hourglass-half mr-2"></i>QUEUED';
-                }
-            });
-        }
-
-        // تحديث شريط التحميل
-        function updateProgressBar(info) {
-            const percent = Math.round((info.loaded / info.total) * 100);
-            const progressBar = document.getElementById('progress-bar');
-            const percentText = document.getElementById('upload-percent');
-            const uploadedSize = document.getElementById('uploaded-size');
+        // تغيير نوع الرفع
+        function setUploadType(type) {
+            currentType = type;
             
-            if (progressBar) progressBar.style.width = percent + '%';
-            if (percentText) percentText.textContent = percent + '%';
-            if (uploadedSize) uploadedSize.textContent = formatBytes(info.loaded);
+            // تحديث الأزرار
+            document.getElementById('videoTypeBtn').className = 
+                type === 'video' ? 'flex-1 py-3 rounded-lg font-[Orbitron] bg-cyan-500/20 border border-cyan-400 text-cyan-400' :
+                'flex-1 py-3 rounded-lg font-[Orbitron] bg-white/5 border border-white/20 text-white/70';
             
-            document.getElementById('upload-status').innerHTML = '<i class="fas fa-upload mr-2"></i>UPLOADING';
+            document.getElementById('imageTypeBtn').className = 
+                type === 'image' ? 'flex-1 py-3 rounded-lg font-[Orbitron] bg-cyan-500/20 border border-cyan-400 text-cyan-400' :
+                'flex-1 py-3 rounded-lg font-[Orbitron] bg-white/5 border border-white/20 text-white/70';
             
-            // حساب الوقت المتبقي
-            if (uploadStartTime && percent > 0) {
-                const elapsed = (Date.now() - uploadStartTime) / 1000;
-                const speed = info.loaded / elapsed;
-                const remaining = (info.total - info.loaded) / speed;
-                document.getElementById('time-remaining').textContent = `ESTIMATED: ${formatTime(remaining)}`;
+            // تحديث نوع الملفات المقبولة
+            const input = document.getElementById('fileInput');
+            const hint = document.getElementById('fileTypeHint');
+            
+            if (type === 'video') {
+                input.accept = 'video/*';
+                hint.textContent = 'Click or drop video file here (MP4, MOV, AVI)';
+            } else {
+                input.accept = 'image/*';
+                hint.textContent = 'Click or drop image file here (JPG, PNG, GIF)';
             }
+            
+            updateLog(`UPLOAD_MODE :: ${type.toUpperCase()}`);
         }
 
-        // وظائف مساعدة
+        // معالجة اختيار الملف
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            handleFile(e.target.files[0]);
+        });
+
+        // السحب والإفلات
+        const uploadArea = document.querySelector('.upload-area');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#fff';
+            uploadArea.style.background = 'rgba(0, 242, 255, 0.1)';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = 'var(--v-color)';
+            uploadArea.style.background = 'rgba(0, 242, 255, 0.02)';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--v-color)';
+            uploadArea.style.background = 'rgba(0, 242, 255, 0.02)';
+            
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+            
+            // التحقق من النوع
+            const isValid = currentType === 'video' ? 
+                file.type.startsWith('video/') : 
+                file.type.startsWith('image/');
+            
+            if (!isValid) {
+                alert(`Please select a valid ${currentType} file!`);
+                return;
+            }
+            
+            selectedFile = file;
+            
+            // عرض المعلومات
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('fileSize').textContent = formatBytes(file.size);
+            document.getElementById('uploadedSize').textContent = '0 Bytes';
+            document.getElementById('uploadStatus').innerHTML = '<i class="fas fa-check mr-2"></i>FILE READY';
+            document.getElementById('uploadPercent').textContent = '0%';
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('uploadBtn').disabled = false;
+            
+            // معاينة الملف
+            showPreview(file);
+            
+            updateLog(`FILE_SELECTED :: ${file.name}`);
+        }
+
+        function showPreview(file) {
+            const container = document.getElementById('previewContainer');
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                if (file.type.startsWith('video')) {
+                    container.innerHTML = `
+                        <video src="${e.target.result}" controls class="preview-media"></video>
+                        <p class="text-xs text-cyan-400 mt-2 font-mono">${file.name}</p>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <img src="${e.target.result}" class="preview-media">
+                        <p class="text-xs text-cyan-400 mt-2 font-mono">${file.name}</p>
+                    `;
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
         function formatBytes(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -433,189 +372,88 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        function formatTime(seconds) {
-            if (seconds < 60) return Math.round(seconds) + 's';
-            const minutes = Math.floor(seconds / 60);
-            const secs = Math.round(seconds % 60);
-            return minutes + 'm ' + secs + 's';
-        }
-
-        function setUploadType(type) {
-            currentUploadType = type;
-            
-            // تحديث الأزرار
-            document.querySelectorAll('.type-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.closest('.type-btn').classList.add('active');
-            
-            // تحديث النص والتنسيقات
-            const hint = document.getElementById('file-type-hint');
-            const input = document.getElementById('file-input');
-            
-            if (type === 'video') {
-                hint.textContent = 'VIDEO FILES ONLY (MP4, MOV, AVI)';
-                input.accept = 'video/*';
-            } else {
-                hint.textContent = 'IMAGE FILES ONLY (JPG, PNG, GIF)';
-                input.accept = 'image/*';
-            }
-            
-            // إعادة تهيئة الـ Widget
-            initCloudinaryWidget();
-            updateLog("UPLOAD_TYPE_SET :: " + type.toUpperCase());
-        }
-
-        // معالجة الملفات
-        function handleFileSelect(file) {
-            if (!file) return;
-            
-            selectedFile = file;
-            
-            // التحقق من نوع الملف
-            const isValid = currentUploadType === 'video' ? 
-                file.type.startsWith('video/') : 
-                file.type.startsWith('image/');
-            
-            if (!isValid) {
-                alert(`Please select a valid ${currentUploadType} file!`);
-                return;
-            }
-            
-            // عرض معاينة الملف
-            showFilePreview(file);
-            
-            // تحديث واجهة المستخدم
-            document.getElementById('progress-section').style.display = 'block';
-            document.getElementById('file-size').textContent = formatBytes(file.size);
-            document.getElementById('uploaded-size').textContent = '0 Bytes';
-            document.getElementById('upload-status').innerHTML = '<i class="fas fa-check mr-2"></i>FILE READY';
-            document.getElementById('upload-btn').disabled = false;
-            
-            updateLog("FILE_SELECTED :: " + file.name);
-        }
-
-        function showFilePreview(file) {
-            const container = document.getElementById('file-preview-container');
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-                if (file.type.startsWith('video')) {
-                    container.innerHTML = `
-                        <video src="${e.target.result}" controls class="file-preview"></video>
-                        <p class="text-xs text-cyan-400 mt-2 font-[Orbitron]">${file.name}</p>
-                    `;
-                } else if (file.type.startsWith('image')) {
-                    container.innerHTML = `
-                        <img src="${e.target.result}" class="file-preview">
-                        <p class="text-xs text-cyan-400 mt-2 font-[Orbitron]">${file.name}</p>
-                    `;
-                }
-            };
-            
-            reader.readAsDataURL(file);
-        }
-
-        // وظائف الرفع
+        // بدء الرفع
         function startUpload() {
-            if (!selectedFile) {
-                alert('Please select a file first!');
-                return;
-            }
+            if (!selectedFile) return;
             
-            uploadStartTime = Date.now();
-            updateLog("INITIATING_UPLOAD_SEQUENCE");
-            document.getElementById('upload-btn').disabled = true;
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>UPLOADING...';
             
-            // استخدام Cloudinary Widget
-            if (cloudinaryWidget) {
-                cloudinaryWidget.open();
-            } else {
-                // Fallback للمحاكاة
-                simulateUpload();
-            }
-        }
-
-        function simulateUpload() {
-            let progress = 0;
-            const totalSize = selectedFile.size;
+            updateLog(`UPLOAD_STARTED :: ${selectedFile.name}`);
             
-            const interval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress >= 100) progress = 100;
-                
-                const progressBar = document.getElementById('progress-bar');
-                const percentText = document.getElementById('upload-percent');
-                const uploadedSize = document.getElementById('uploaded-size');
-                
-                if (progressBar) progressBar.style.width = progress + '%';
-                if (percentText) percentText.textContent = Math.round(progress) + '%';
-                if (uploadedSize) uploadedSize.textContent = formatBytes(totalSize * progress / 100);
-                
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    document.getElementById('upload-status').innerHTML = '<i class="fas fa-check-circle mr-2"></i>UPLOAD COMPLETE';
+            // رفع إلى Firebase Storage
+            const storageRef = storage.ref();
+            const timestamp = Date.now();
+            const fileName = `${currentType}_${timestamp}_${selectedFile.name}`;
+            const fileRef = storageRef.child(`uploads/${fileName}`);
+            
+            const uploadTask = fileRef.put(selectedFile);
+            
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    // تحديث شريط التقدم
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    const percent = Math.round(progress);
                     
-                    // حفظ في قاعدة البيانات
-                    const mockUrl = URL.createObjectURL(selectedFile);
-                    db.ref('videos/').push({
-                        url: mockUrl,
-                        type: currentUploadType,
+                    document.getElementById('progressBar').style.width = percent + '%';
+                    document.getElementById('uploadPercent').textContent = percent + '%';
+                    document.getElementById('uploadedSize').textContent = formatBytes(snapshot.bytesTransferred);
+                    document.getElementById('uploadStatus').innerHTML = '<i class="fas fa-upload mr-2"></i>UPLOADING';
+                    
+                },
+                (error) => {
+                    // خطأ في الرفع
+                    updateLog(`UPLOAD_ERROR :: ${error.message}`);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-play mr-2"></i>RETRY UPLOAD';
+                    document.getElementById('uploadStatus').innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>UPLOAD FAILED';
+                },
+                async () => {
+                    // اكتمل الرفع
+                    const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                    
+                    document.getElementById('uploadStatus').innerHTML = '<i class="fas fa-check-circle mr-2"></i>UPLOAD COMPLETE';
+                    
+                    // حفظ في Realtime Database
+                    const uploadData = {
+                        url: downloadURL,
+                        type: currentType,
                         likes: 0,
-                        timestamp: Date.now()
-                    });
+                        timestamp: timestamp,
+                        filename: selectedFile.name,
+                        size: selectedFile.size
+                    };
+                    
+                    await db.ref('videos/').push(uploadData);
+                    
+                    updateLog(`UPLOAD_SUCCESS :: ${currentType.toUpperCase()}`);
                     
                     setTimeout(() => {
                         closeUploadPanel();
-                        resetUploadInterface();
-                    }, 1500);
+                        resetUploadForm();
+                    }, 2000);
                 }
-            }, 200);
+            );
         }
 
-        function resetUploadInterface() {
+        function resetUploadForm() {
             selectedFile = null;
-            document.getElementById('progress-section').style.display = 'none';
-            document.getElementById('file-preview-container').innerHTML = '';
-            document.getElementById('progress-bar').style.width = '0%';
-            document.getElementById('upload-btn').disabled = false;
-            document.getElementById('file-input').value = '';
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('previewContainer').innerHTML = '';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('uploadBtn').disabled = true;
+            document.getElementById('uploadBtn').innerHTML = '<i class="fas fa-play mr-2"></i>START UPLOAD';
         }
 
-        // فتح وإغلاق اللوحات
         function openUploadPanel() {
             document.getElementById('upload-panel').style.display = 'flex';
-            initCloudinaryWidget();
+            resetUploadForm();
             updateLog("UPLOAD_INTERFACE_ACTIVE");
-            
-            // إعداد مستمع الملفات
-            const fileInput = document.getElementById('file-input');
-            fileInput.onchange = (e) => handleFileSelect(e.target.files[0]);
-            
-            // إعداد السحب والإفلات
-            const dropZone = document.getElementById('drop-zone');
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropZone.classList.add('dragover');
-            });
-            
-            dropZone.addEventListener('dragleave', () => {
-                dropZone.classList.remove('dragover');
-            });
-            
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleFileSelect(files[0]);
-                }
-            });
         }
 
         function closeUploadPanel() {
             document.getElementById('upload-panel').style.display = 'none';
-            resetUploadInterface();
             updateLog("UPLOAD_INTERFACE_CLOSED");
         }
 
@@ -625,12 +463,9 @@
         }
 
         function checkAdmin() {
-            const password = prompt("ENTER ACCESS CODE:");
-            if (password === "1234") {
+            if(prompt("ACCESS CODE:") === "1234") {
                 document.getElementById('admin-panel').style.display = 'flex';
                 updateLog("ADMIN_ACCESS_GRANTED");
-            } else if (password) {
-                updateLog("ACCESS_DENIED");
             }
         }
 
@@ -638,24 +473,17 @@
             document.getElementById('admin-panel').style.display = 'none';
         }
 
-        // تهيئة المراقب والألوان
+        // باقي الوظائف كما هي
         const ionicColors = ['#00f2ff', '#ff007f', '#00ff88', '#ffcc00', '#9d00ff'];
 
-        // مراقبة قاعدة البيانات
         db.ref('videos').on('value', snap => {
             const container = document.getElementById('video-stack');
             const adminList = document.getElementById('admin-master-list');
-            
-            if (!container) return;
-            
             container.innerHTML = ''; 
             if(adminList) adminList.innerHTML = '';
             
             const data = snap.val(); 
-            if(!data) {
-                container.innerHTML = '<div class="flex items-center justify-center h-full text-cyan-400 font-[Orbitron]">NO_CONTENT_AVAILABLE</div>';
-                return;
-            }
+            if(!data) return;
 
             Object.keys(data).reverse().forEach(id => {
                 const vid = data[id];
@@ -665,7 +493,7 @@
                 if (vid.type === 'image') {
                     section.innerHTML = `
                         <div class="watermark">VOID_LION_PRO</div>
-                        <img src="${vid.url}" class="media-content" onclick="this.requestFullscreen?.()">
+                        <img src="${vid.url}" class="media-content">
                         <div class="sidebar-ops">
                             <div class="op-btn" onclick="triggerLike('${id}')"><i class="fas fa-bolt"></i><span>${vid.likes || 0}</span></div>
                             <div class="op-btn" onclick="toggleComments()"><i class="fas fa-comment"></i><span>COMMS</span></div>
@@ -684,21 +512,10 @@
                 }
                 
                 container.appendChild(section);
-                
                 if(adminList) {
-                    adminList.innerHTML += `
-                        <div class="bg-white/5 p-4 rounded-xl flex justify-between items-center border border-white/10">
-                            <div>
-                                <span class="text-cyan-400">NODE_${id.substring(0,8)}</span>
-                                <span class="text-xs text-white/50 ml-2">${vid.type || 'video'}</span>
-                            </div>
-                            <button onclick="deleteVid('${id}')" class="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg hover:bg-red-500/30 transition-all">
-                                <i class="fas fa-trash mr-2"></i>PURGE
-                            </button>
-                        </div>`;
+                    adminList.innerHTML += `<div class="bg-white/5 p-4 rounded-xl flex justify-between border border-white/10"><span>NODE_${id.substring(0,6)} (${vid.type || 'video'})</span><button onclick="deleteVid('${id}')" class="text-red-500">DELETE</button></div>`;
                 }
             });
-            
             initObserver();
         });
 
@@ -709,91 +526,65 @@
                     if (v && e.isIntersecting) { 
                         if(!v.src) v.src = v.dataset.src;
                         v.play().catch(()=>{}); 
-                        document.documentElement.style.setProperty('--v-color', ionicColors[Math.floor(Math.random() * ionicColors.length)]);
+                        document.documentElement.style.setProperty('--v-color', ionicColors[Math.floor(Math.random() * 5)]);
                         updateLog("SCANNING_NODE_" + (v.id ? v.id.substring(4,10) : 'IMAGE'));
                     } else if (v) { 
                         v.pause(); 
                     }
                 });
             }, { threshold: 0.7 });
-            
             document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
-        }
-
-        // وظائف التفاعل
-        function triggerLike(id) { 
-            db.ref('videos/' + id + '/likes').transaction(l => (l || 0) + 1); 
-            updateLog("NODE_UPVOTED");
-        }
-
-        function toggleMute(id) { 
-            const v = document.getElementById('vid-'+id); 
-            const btn = document.getElementById('mute-btn-'+id);
-            if(v && btn) {
-                v.muted = !v.muted; 
-                btn.innerHTML = v.muted ? 
-                    '<i class="fas fa-volume-off"></i><span>AUDIO</span>' : 
-                    '<i class="fas fa-volume-up"></i><span>LIVE</span>'; 
-            }
         }
 
         function shareNode(url) { 
             if(navigator.share) { 
                 navigator.share({title: 'VOID_LION', url: url}); 
-            } else {
-                navigator.clipboard?.writeText(url).then(() => {
-                    updateLog("LINK_COPIED_TO_CLIPBOARD");
-                });
+            } else { 
+                navigator.clipboard?.writeText(url);
+                updateLog("LINK_COPIED");
             } 
-        }
-
-        function deleteVid(id) { 
-            if(confirm("CONFIRM NODE PURGE?")) {
-                db.ref('videos/' + id).remove()
-                    .then(() => updateLog("NODE_PURGED_SUCCESSFULLY"))
-                    .catch(err => updateLog("PURGE_ERROR :: " + err));
-            }
         }
 
         function sendSignal() {
             const inp = document.getElementById('msg-input');
-            if(inp && inp.value.trim()) { 
-                db.ref('vox_chat').push({ 
-                    text: inp.value,
-                    timestamp: Date.now()
-                }).then(() => {
-                    inp.value = ''; 
-                    updateLog("SIGNAL_BROADCASTED");
-                });
+            if(inp.value.trim()) { 
+                db.ref('vox_chat').push({ text: inp.value }); 
+                inp.value = ''; 
+                updateLog("SIGNAL_BROADCASTED");
             }
         }
 
-        // مراقبة المحادثة
-        db.ref('vox_chat').limitToLast(50).on('value', s => {
+        db.ref('vox_chat').on('value', s => {
             const box = document.getElementById('chat-box'); 
-            if(box) {
-                box.innerHTML = '';
-                s.forEach(m => {
-                    const msg = m.val();
-                    box.innerHTML += `
-                        <div class="bg-white/5 p-3 rounded-lg border-r-2 border-[var(--v-color)] font-mono text-[11px] text-white/80">
-                            <span class="text-cyan-400 text-[9px]">SIGNAL_IN::</span> ${msg.text}
-                        </div>`;
-                });
-                box.scrollTop = box.scrollHeight;
-            }
+            box.innerHTML = '';
+            s.forEach(m => {
+                box.innerHTML += `<div class="bg-white/5 p-3 rounded-lg border-r-2 border-[var(--v-color)] font-mono text-[11px] text-white/80">SIGNAL_IN:: ${m.val().text}</div>`;
+            });
+            box.scrollTop = box.scrollHeight;
         });
 
-        // الساعة
+        function toggleMute(id) { 
+            const v = document.getElementById('vid-'+id); 
+            v.muted = !v.muted; 
+            document.getElementById('mute-btn-'+id).innerHTML = v.muted ? 
+                '<i class="fas fa-volume-off"></i><span>AUDIO</span>' : 
+                '<i class="fas fa-volume-up"></i><span>LIVE</span>'; 
+        }
+
+        function deleteVid(id) { 
+            if(confirm("Confirm Purge?")) db.ref('videos/' + id).remove(); 
+        }
+
+        function triggerLike(id) { 
+            db.ref('videos/' + id + '/likes').transaction(l => (l || 0) + 1); 
+            updateLog("NODE_UPVOTED");
+        }
+
         setInterval(() => {
-            const clock = document.getElementById('clock');
-            if(clock) clock.innerText = new Date().toLocaleTimeString('en-GB');
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB');
         }, 1000);
 
-        // ربط الأحداث
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById("upload-trigger").onclick = openUploadPanel;
-        });
+        document.getElementById("upload-trigger").onclick = openUploadPanel;
     </script>
 </body>
 </html>
