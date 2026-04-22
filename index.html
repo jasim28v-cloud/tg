@@ -15,50 +15,49 @@
         :root { --v-color: #00f2ff; --bg: #000; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
 
-        /* محرك التصفح (Void-Engine) */
         .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; position: relative; z-index: 10; }
         .scroll-engine::-webkit-scrollbar { display: none; }
         
         .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; scroll-snap-stop: always; position: relative; overflow: hidden; }
 
-        /* تأثير الثقب الأسود العميق */
         video { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 5;
             -webkit-mask-image: radial-gradient(circle at center, black 35%, rgba(0,0,0,0.4) 65%, transparent 95%);
             mask-image: radial-gradient(circle at center, black 35%, rgba(0,0,0,0.4) 65%, transparent 95%);
         }
 
-        /* العلامة المائية الثابتة */
         .watermark { 
             position: absolute; top: 50%; right: 15px; transform: translateY(-50%) rotate(-90deg); 
             font-family: 'Orbitron'; font-size: 11px; font-weight: 900; 
             color: rgba(255,255,255,0.18); letter-spacing: 6px; z-index: 45; pointer-events: none; 
         }
 
-        /* الساعة الرقمية وسجل النظام */
         .digital-clock { position: fixed; top: 35px; left: 25px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 8px 15px; border-radius: 12px; border: 1px solid var(--v-color); font-family: 'Orbitron'; font-size: 14px; color: var(--v-color); z-index: 1000; box-shadow: 0 0 10px var(--v-color); }
         .system-log { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 85%; text-align: center; font-family: 'Orbitron'; font-size: 8px; color: var(--v-color); opacity: 0.7; z-index: 400; }
 
-        /* الأزرار الجانبية المحدثة */
         .sidebar-ops { position: absolute; left: 20px; top: 55%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 18px; z-index: 100; }
         .op-btn { width: 58px; height: 58px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1.5px solid var(--v-color); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
         .op-btn i { font-size: 20px; color: var(--v-color); }
         .op-btn span { font-size: 8px; font-family: 'Orbitron'; color: #fff; margin-top: 2px; font-weight: bold; }
 
-        /* الهيدر والأسد */
         header { position: fixed; top: 30px; right: 25px; z-index: 500; }
         .brand-box { background: rgba(0,0,0,0.4); padding: 10px 20px; border-right: 4px solid var(--v-color); backdrop-filter: blur(15px); border-radius: 8px; display: flex; align-items: center; gap: 12px; }
         
         nav { position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; height: 75px; background: rgba(0,5,10,0.8); backdrop-filter: blur(25px); border: 1px solid var(--v-color); border-radius: 40px; display: flex; justify-content: space-around; align-items: center; z-index: 500; }
-        #upload-trigger { width: 75px; height: 75px; background: linear-gradient(135deg, var(--v-color), #0044ff); border-radius: 50%; margin-top: -45px; display: flex; align-items: center; justify-content: center; border: 5px solid #000; box-shadow: 0 0 25px var(--v-color); cursor: pointer; }
+        #upload-trigger-btn { width: 75px; height: 75px; background: linear-gradient(135deg, var(--v-color), #0044ff); border-radius: 50%; margin-top: -45px; display: flex; align-items: center; justify-content: center; border: 5px solid #000; box-shadow: 0 0 25px var(--v-color); cursor: pointer; transition: 0.3s; }
+        #upload-trigger-btn:active { transform: scale(0.9); }
 
-        #comment-overlay, #admin-panel { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.97); display: none; flex-direction: column; padding: 40px 25px; backdrop-filter: blur(20px); }
+        #comment-overlay, #admin-panel, #upload-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.95); display: none; flex-direction: column; padding: 40px 25px; backdrop-filter: blur(25px); }
+
+        /* ستايل واجهة الرفع الجديدة */
+        .upload-card { border: 2px dashed var(--v-color); border-radius: 30px; padding: 40px 20px; text-align: center; background: rgba(255,255,255,0.03); cursor: pointer; transition: 0.3s; }
+        .upload-card:hover { background: rgba(0,242,255,0.05); }
     </style>
 </head>
 <body>
 
     <div class="digital-clock" id="clock">00:00:00</div>
-    <div class="system-log" id="log-text">SYSTEM_ACTIVE :: NODES_ONLINE</div>
+    <div class="system-log" id="log-text">SYSTEM_READY :: STANDBY</div>
     
     <header>
         <div class="brand-box">
@@ -71,9 +70,37 @@
 
     <nav>
         <div class="cursor-pointer text-white/30" onclick="checkAdmin()"><i class="fas fa-fingerprint text-3xl"></i></div>
-        <div id="upload-trigger"><i class="fas fa-camera text-2xl text-white"></i></div>
+        <div id="upload-trigger-btn" onclick="toggleUpload()"><i class="fas fa-plus text-2xl text-white"></i></div>
         <div class="cursor-pointer text-white/30" onclick="toggleComments()"><i class="fas fa-tower-broadcast text-3xl"></i></div>
     </nav>
+
+    <div id="upload-overlay">
+        <div class="flex justify-between items-center mb-12 border-b border-cyan-900 pb-4">
+            <h2 class="font-[Orbitron] text-cyan-400 text-xl tracking-[4px]">CLOUD_UPLOAD</h2>
+            <i class="fas fa-xmark text-3xl text-white cursor-pointer" onclick="toggleUpload()"></i>
+        </div>
+        
+        <div class="flex flex-col items-center justify-center flex-1">
+            <div class="upload-card w-full max-w-sm mb-8" onclick="openWidget()">
+                <div class="w-20 h-20 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(0,242,255,0.3)]">
+                    <i class="fas fa-cloud-arrow-up text-3xl text-cyan-400"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-2">رفع فيديو جديد</h3>
+                <p class="text-white/40 text-sm font-mono">MP4, WEBM | MAX 100MB</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 w-full max-w-sm">
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
+                    <i class="fas fa-shield-halved text-cyan-400 mb-2"></i>
+                    <p class="text-[10px] text-white/50 font-mono">SECURE_NODE</p>
+                </div>
+                <div class="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
+                    <i class="fas fa-bolt text-yellow-400 mb-2"></i>
+                    <p class="text-[10px] text-white/50 font-mono">FAST_SYNC</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="comment-overlay">
         <div class="flex justify-between items-center mb-8 border-b border-cyan-900 pb-4">
@@ -102,6 +129,7 @@
 
         function updateLog(msg) { document.getElementById('log-text').innerText = msg; }
 
+        // إعداد Cloudinary Widget
         const widget = cloudinary.createUploadWidget({ 
             cloudName: "duzoqh3jp", uploadPreset: "so_34k",
             sources: ['local'], clientAllowedFormats: ["video"], multiple: false
@@ -109,9 +137,16 @@
             if (r.event === "success") {
                 db.ref('videos/').push({ url: r.info.secure_url, likes: 0, timestamp: Date.now() });
                 updateLog("NEW_ASSET_DEPLOYED");
+                toggleUpload(); // إغلاق الواجهة بعد الرفع
             }
         });
-        document.getElementById("upload-trigger").onclick = () => widget.open();
+
+        function toggleUpload() {
+            const up = document.getElementById('upload-overlay');
+            up.style.display = (up.style.display==='flex')?'none':'flex';
+        }
+
+        function openWidget() { widget.open(); }
 
         const ionicColors = ['#00f2ff', '#ff007f', '#00ff88', '#ffcc00', '#9d00ff'];
 
