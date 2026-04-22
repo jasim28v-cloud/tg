@@ -14,9 +14,9 @@
         :root { --v-color: #00f2ff; --bg: #000; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
 
+        /* محرك التصفح (Void-Engine) */
         .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; position: relative; z-index: 10; }
         .scroll-engine::-webkit-scrollbar { display: none; }
-        
         .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; scroll-snap-stop: always; position: relative; overflow: hidden; }
 
         video { 
@@ -25,23 +25,22 @@
             mask-image: radial-gradient(circle at center, black 35%, rgba(0,0,0,0.4) 65%, transparent 95%);
         }
 
-        .digital-clock { position: fixed; top: 35px; left: 25px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 8px 15px; border-radius: 12px; border: 1px solid var(--v-color); font-family: 'Orbitron'; font-size: 14px; color: var(--v-color); z-index: 1000; }
+        .digital-clock { position: fixed; top: 35px; left: 25px; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); padding: 8px 15px; border-radius: 12px; border: 1px solid var(--v-color); font-family: 'Orbitron'; font-size: 14px; color: var(--v-color); z-index: 1000; box-shadow: 0 0 10px var(--v-color); }
         .system-log { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); width: 85%; text-align: center; font-family: 'Orbitron'; font-size: 8px; color: var(--v-color); opacity: 0.7; z-index: 400; }
 
-        header { position: fixed; top: 30px; right: 25px; z-index: 500; }
-        .brand-box { background: rgba(0,0,0,0.4); padding: 10px 20px; border-right: 4px solid var(--v-color); backdrop-filter: blur(15px); border-radius: 8px; display: flex; align-items: center; gap: 12px; }
-        
+        /* أزرار التحكم */
         nav { position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; height: 75px; background: rgba(0,5,10,0.8); backdrop-filter: blur(25px); border: 1px solid var(--v-color); border-radius: 40px; display: flex; justify-content: space-around; align-items: center; z-index: 500; }
         
-        #upload-trigger-btn { width: 75px; height: 75px; background: linear-gradient(135deg, var(--v-color), #0044ff); border-radius: 50%; margin-top: -45px; display: flex; align-items: center; justify-content: center; border: 5px solid #000; box-shadow: 0 0 25px var(--v-color); cursor: pointer; position: relative; }
-
-        /* شريط التحميل الدائري حول الزر */
-        .progress-ring { position: absolute; top: -5px; left: -5px; width: 85px; height: 85px; pointer-events: none; transform: rotate(-90deg); display: none; }
-        .progress-ring circle { stroke: var(--v-color); stroke-width: 4; fill: transparent; stroke-dasharray: 251; stroke-dashoffset: 251; transition: 0.2s; }
-
-        #upload-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.95); display: none; flex-direction: column; padding: 40px 25px; backdrop-filter: blur(25px); }
-        .upload-card { border: 2px dashed var(--v-color); border-radius: 30px; padding: 40px 20px; text-align: center; background: rgba(255,255,255,0.03); cursor: pointer; }
+        /* زر الرفع مع شريط التحميل الدائري */
+        #upload-container { position: relative; width: 75px; height: 75px; margin-top: -45px; }
+        #upload-trigger-btn { width: 100%; height: 100%; background: linear-gradient(135deg, var(--v-color), #0044ff); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 5px solid #000; box-shadow: 0 0 25px var(--v-color); cursor: pointer; transition: 0.3s; z-index: 2; position: relative; }
         
+        .progress-ring { position: absolute; top: -5px; left: -5px; width: 85px; height: 85px; transform: rotate(-90deg); z-index: 1; pointer-events: none; display: none; }
+        .progress-ring circle { stroke: var(--v-color); stroke-width: 4; fill: transparent; stroke-dasharray: 251.2; stroke-dashoffset: 251.2; transition: stroke-dashoffset 0.1s linear; stroke-linecap: round; }
+
+        #upload-overlay, #comment-overlay, #admin-panel { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.95); display: none; flex-direction: column; padding: 40px 25px; backdrop-filter: blur(25px); }
+        .upload-card { border: 2px dashed var(--v-color); border-radius: 30px; padding: 40px; text-align: center; background: rgba(255,255,255,0.03); cursor: pointer; }
+
         .sidebar-ops { position: absolute; left: 20px; top: 55%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 18px; z-index: 100; }
         .op-btn { width: 58px; height: 58px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1.5px solid var(--v-color); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
         .op-btn i { font-size: 20px; color: var(--v-color); }
@@ -51,32 +50,50 @@
 <body>
 
     <div class="digital-clock" id="clock">00:00:00</div>
-    <div class="system-log" id="log-text">SYSTEM_READY</div>
+    <div class="system-log" id="log-text">SYSTEM_READY :: V27</div>
     
-    <header><div class="brand-box"><i class="fas fa-lion text-2xl" style="color: var(--v-color);"></i><span class="font-[Orbitron] text-white">VOID_LION_V27</span></div></header>
+    <header>
+        <div class="brand-box">
+            <i class="fas fa-lion text-2xl" style="color: var(--v-color);"></i>
+            <span class="font-[Orbitron] text-[13px] font-black tracking-[4px] text-white">VOID_LION</span>
+        </div>
+    </header>
 
     <main class="scroll-engine" id="video-stack"></main>
 
     <nav>
-        <div onclick="checkAdmin()"><i class="fas fa-fingerprint text-3xl text-white/30"></i></div>
-        <div id="upload-trigger-btn" onclick="toggleUpload()">
-            <svg class="progress-ring" id="p-ring"><circle cx="42.5" cy="42.5" r="40"></circle></svg>
-            <i class="fas fa-plus text-2xl text-white" id="upload-icon"></i>
+        <div class="cursor-pointer text-white/30" onclick="checkAdmin()"><i class="fas fa-fingerprint text-3xl"></i></div>
+        
+        <div id="upload-container">
+            <svg class="progress-ring" id="svg-ring"><circle cx="42.5" cy="42.5" r="40"></circle></svg>
+            <div id="upload-trigger-btn" onclick="openFilePicker()">
+                <i class="fas fa-plus text-2xl text-white" id="up-icon"></i>
+            </div>
         </div>
-        <div onclick="toggleComments()"><i class="fas fa-tower-broadcast text-3xl text-white/30"></i></div>
+
+        <div class="cursor-pointer text-white/30" onclick="toggleComments()"><i class="fas fa-tower-broadcast text-3xl"></i></div>
     </nav>
 
-    <div id="upload-overlay">
-        <div class="flex justify-between items-center mb-12 border-b border-cyan-900 pb-4">
-            <h2 class="font-[Orbitron] text-cyan-400">DIRECT_UPLOAD</h2>
-            <i class="fas fa-xmark text-3xl text-white cursor-pointer" onclick="toggleUpload()"></i>
+    <input type="file" id="silent-input" hidden accept="video/*" onchange="startDirectUpload(this.files[0])">
+
+    <div id="comment-overlay">
+        <div class="flex justify-between items-center mb-8 border-b border-cyan-900 pb-4">
+            <h2 class="font-[Orbitron] text-cyan-400 text-xl tracking-[4px]">NEURAL_CHAT</h2>
+            <i class="fas fa-xmark text-3xl text-red-500 cursor-pointer" onclick="toggleComments()"></i>
         </div>
-        <input type="file" id="file-input" hidden accept="video/*" onchange="handleUpload(this.files[0])">
-        <div class="upload-card" onclick="document.getElementById('file-input').click()">
-            <i class="fas fa-cloud-arrow-up text-4xl text-cyan-400 mb-4"></i>
-            <h3 class="text-white font-bold">اختار الفيديو</h3>
-            <p id="upload-status" class="text-white/40 text-xs mt-2">WAITING_FOR_INPUT</p>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 mb-6"></div>
+        <div class="flex gap-3 bg-white/5 p-4 rounded-2xl border border-white/10">
+            <input type="text" id="msg-input" class="flex-1 bg-transparent outline-none text-cyan-400" placeholder="Type signal...">
+            <button onclick="sendSignal()" class="text-cyan-400"><i class="fas fa-paper-plane text-2xl"></i></button>
         </div>
+    </div>
+
+    <div id="admin-panel">
+        <div class="flex justify-between items-center mb-8 border-b border-red-900 pb-4">
+            <h2 class="font-[Orbitron] text-red-500 text-xl font-bold">PURGE_DASHBOARD</h2>
+            <i class="fas fa-xmark text-3xl text-white cursor-pointer" onclick="closeAdmin()"></i>
+        </div>
+        <div class="flex-1 overflow-y-auto space-y-4" id="admin-master-list"></div>
     </div>
 
     <script>
@@ -84,27 +101,26 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // إعدادات Cloudinary
+        // بيانات Cloudinary الخاصة بك
         const CLOUD_NAME = "duzoqh3jp";
         const UPLOAD_PRESET = "so_34k";
 
-        function toggleUpload() {
-            const up = document.getElementById('upload-overlay');
-            up.style.display = (up.style.display==='flex')?'none':'flex';
-        }
+        function updateLog(msg) { document.getElementById('log-text').innerText = msg; }
 
-        async function handleUpload(file) {
+        function openFilePicker() { document.getElementById('silent-input').click(); }
+
+        // محرك الرفع المباشر مع شريط التحميل
+        async function startDirectUpload(file) {
             if (!file) return;
-            
-            toggleUpload(); // إغلاق النافذة فوراً
-            updateLog("UPLOADING_NODE...");
-            
-            const ring = document.getElementById('p-ring');
+
+            const ring = document.getElementById('svg-ring');
             const circle = ring.querySelector('circle');
-            const icon = document.getElementById('upload-icon');
+            const icon = document.getElementById('up-icon');
             
+            // تفعيل الواجهة
             ring.style.display = 'block';
             icon.className = "fas fa-spinner fa-spin text-2xl text-white";
+            updateLog("UPLOADING_NODE_0%");
 
             const formData = new FormData();
             formData.append('file', file);
@@ -113,34 +129,46 @@
             const xhr = new XMLHttpRequest();
             xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`);
 
+            // تحديث شريط التحميل الدائري
             xhr.upload.onprogress = (e) => {
-                const percent = Math.round((e.loaded / e.total) * 100);
-                const offset = 251 - (251 * percent / 100);
-                circle.style.strokeDashoffset = offset;
-                updateLog(`SYNCING: ${percent}%`);
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    const offset = 251.2 - (251.2 * percent / 100);
+                    circle.style.strokeDashoffset = offset;
+                    updateLog(`SYNCING_ASSET_${percent}%`);
+                }
             };
 
             xhr.onload = () => {
-                const res = JSON.parse(xhr.responseText);
-                db.ref('videos/').push({ url: res.secure_url, likes: 0, timestamp: Date.now() });
-                resetUploadUI("SUCCESS");
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    db.ref('videos/').push({ url: response.secure_url, likes: 0, timestamp: Date.now() });
+                    finishUpload("UPLOAD_COMPLETE");
+                } else {
+                    finishUpload("SYNC_FAILED");
+                }
             };
 
-            xhr.onerror = () => resetUploadUI("ERROR");
+            xhr.onerror = () => finishUpload("CONNECTION_LOST");
             xhr.send(formData);
         }
 
-        function resetUploadUI(status) {
-            updateLog(status);
-            document.getElementById('p-ring').style.display = 'none';
-            document.getElementById('upload-icon').className = "fas fa-plus text-2xl text-white";
+        function finishUpload(msg) {
+            updateLog(msg);
+            document.getElementById('svg-ring').style.display = 'none';
+            document.getElementById('up-icon').className = "fas fa-plus text-2xl text-white";
+            document.getElementById('silent-input').value = "";
         }
 
-        // --- بقية الكود الأساسي (Firebase & UI) ---
+        // إعدادات العرض (Observer) والألوان
+        const ionicColors = ['#00f2ff', '#ff007f', '#00ff88', '#ffcc00', '#9d00ff'];
+
         db.ref('videos').on('value', snap => {
             const container = document.getElementById('video-stack');
-            container.innerHTML = '';
+            const adminList = document.getElementById('admin-master-list');
+            container.innerHTML = ''; adminList.innerHTML = '';
             const data = snap.val(); if(!data) return;
+
             Object.keys(data).reverse().forEach(id => {
                 const vid = data[id];
                 const section = document.createElement('section');
@@ -149,8 +177,12 @@
                     <video id="vid-${id}" loop playsinline muted data-src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
                     <div class="sidebar-ops">
                         <div class="op-btn" onclick="triggerLike('${id}')"><i class="fas fa-bolt"></i><span>${vid.likes || 0}</span></div>
+                        <div class="op-btn" onclick="toggleMute('${id}')" id="mute-btn-${id}"><i class="fas fa-volume-off"></i><span>AUDIO</span></div>
+                        <div class="op-btn" onclick="toggleComments()"><i class="fas fa-comment"></i><span>COMMS</span></div>
+                        <div class="op-btn" onclick="shareNode('${vid.url}')"><i class="fas fa-share-nodes"></i><span>SHARE</span></div>
                     </div>`;
                 container.appendChild(section);
+                adminList.innerHTML += `<div class="bg-white/5 p-4 rounded-xl flex justify-between border border-white/10"><span>NODE_${id.substring(0,6)}</span><button onclick="deleteVid('${id}')" class="text-red-500">DELETE</button></div>`;
             });
             initObserver();
         });
@@ -159,13 +191,34 @@
             const obs = new IntersectionObserver((es) => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
-                    if (e.isIntersecting) { v.src = v.dataset.src; v.play(); } else { v.pause(); }
+                    if (e.isIntersecting) { 
+                        if(!v.src) v.src = v.dataset.src;
+                        v.play().catch(()=>{}); 
+                        document.documentElement.style.setProperty('--v-color', ionicColors[Math.floor(Math.random() * 5)]);
+                    } else { v.pause(); }
                 });
             }, { threshold: 0.7 });
             document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
         }
 
-        function updateLog(msg) { document.getElementById('log-text').innerText = msg; }
+        function shareNode(url) { if(navigator.share) { navigator.share({title: 'VOID_LION', url: url}); } else { alert("Copied!"); } }
+        function sendSignal() {
+            const inp = document.getElementById('msg-input');
+            if(inp.value.trim()) { db.ref('vox_chat').push({ text: inp.value }); inp.value = ''; }
+        }
+
+        db.ref('vox_chat').on('value', s => {
+            const box = document.getElementById('chat-box'); box.innerHTML = '';
+            s.forEach(m => { box.innerHTML += `<div class="bg-white/5 p-3 rounded-lg border-r-2 border-[var(--v-color)] font-mono text-[11px]">IN:: ${m.val().text}</div>`; });
+            box.scrollTop = box.scrollHeight;
+        });
+
+        function toggleMute(id) { const v = document.getElementById('vid-'+id); v.muted = !v.muted; document.getElementById('mute-btn-'+id).innerHTML = v.muted ? '<i class="fas fa-volume-off"></i><span>AUDIO</span>' : '<i class="fas fa-volume-up"></i><span>LIVE</span>'; }
+        function checkAdmin() { if(prompt("ACCESS:") === "1234") document.getElementById('admin-panel').style.display = 'flex'; }
+        function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
+        function deleteVid(id) { if(confirm("Confirm Purge?")) db.ref('videos/' + id).remove(); }
+        function toggleComments() { const o = document.getElementById('comment-overlay'); o.style.display = (o.style.display==='flex')?'none':'flex'; }
+        function triggerLike(id) { db.ref('videos/' + id + '/likes').transaction(l => (l || 0) + 1); }
         setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'), 1000);
     </script>
 </body>
